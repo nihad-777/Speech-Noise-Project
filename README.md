@@ -109,6 +109,3 @@ Please follow the licenses and usage conditions of the original datasets.
 * Add data validation and audio-quality checks.
 * Develop speech-enhancement and noise-classification models.
 
-## Author
-
-Nihad
