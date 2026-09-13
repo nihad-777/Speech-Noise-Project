@@ -1,0 +1,6 @@
+numpy
+pandas
+librosa
+soundfile
+tqdm
+jupyter
