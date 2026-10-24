@@ -1,0 +1,4 @@
+SNR (dB),Reference,Prediction,WER (%)
+5,She began piano education at the age of six.,"To begin here, the registration of the agency fits.",100.0
+10,She began piano education at the age of six.,She began to hear the registration of the agency's.,66.67
+20,She began piano education at the age of six.,She began piano registration of the age of six.,22.22
