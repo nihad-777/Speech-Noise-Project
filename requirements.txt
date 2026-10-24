@@ -6,6 +6,7 @@ librosa
 numpy
 joblib
 scikit-learn
+av<19
 pandas
 matplotlib
 jiwer
