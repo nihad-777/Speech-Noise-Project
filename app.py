@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import os
 import tempfile
@@ -19,7 +18,7 @@ ALLOWED_EXTENSIONS = {
     ".wav", ".mp3", ".m4a", ".flac", ".ogg", ".webm"
 }
 
-_model = None
+_whisper_model = None
 _accent_bundle = None
 
 
@@ -35,64 +34,53 @@ def file_too_large(error):
     }), 413
 
 
-def get_model():
-    """Load the Whisper transcription model once."""
-    global _model
+def get_whisper_model():
+    """Load the speech recognition model only once."""
+    global _whisper_model
 
-    if _model is None:
-        _model = WhisperModel(
+    if _whisper_model is None:
+        _whisper_model = WhisperModel(
             "base",
             device="cpu",
             compute_type="int8",
         )
 
-    return _model
+    return _whisper_model
 
 
 def get_accent_bundle():
-    """Load the trained accent classifier once."""
+    """Load the saved accent classifier."""
     global _accent_bundle
 
     if _accent_bundle is None:
         if not ACCENT_MODEL_PATH.is_file():
             raise FileNotFoundError(
-                f"Accent classifier not found: {ACCENT_MODEL_PATH}"
+                f"Accent model not found: {ACCENT_MODEL_PATH}"
             )
 
-        _accent_bundle = joblib.load(ACCENT_MODEL_PATH)
+        bundle = joblib.load(ACCENT_MODEL_PATH)
 
-        if not isinstance(_accent_bundle, dict):
-            raise ValueError(
-                "Unexpected accent model format. "
-                "Expected a dictionary containing the model and labels."
-            )
+        if not isinstance(bundle, dict) or "model" not in bundle:
+            raise ValueError("Invalid accent classifier file.")
 
-        if "model" not in _accent_bundle:
-            raise ValueError("The saved accent bundle has no 'model' entry.")
+        _accent_bundle = bundle
 
     return _accent_bundle
 
 
-def extract_accent_features(
-    audio_path,
-    sample_rate=16000,
-    max_seconds=8,
-):
-    """
-    Extract the 48 features used by the training script:
-    40 MFCC statistics and 8 additional audio statistics.
-    """
-    y, sr = librosa.load(
+def extract_accent_features(audio_path, sample_rate=16000, max_seconds=8):
+    """Extract the same 48 features used during model training."""
+    audio, sr = librosa.load(
         audio_path,
         sr=sample_rate,
         mono=True,
         duration=max_seconds,
     )
 
-    if y.size == 0:
-        raise ValueError("No readable audio samples were found.")
+    if audio.size == 0:
+        raise ValueError("The uploaded audio contains no readable samples.")
 
-    mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=20)
+    mfcc = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=20)
 
     features = [
         *np.mean(mfcc, axis=1),
@@ -100,10 +88,10 @@ def extract_accent_features(
     ]
 
     extra_features = [
-        librosa.feature.spectral_centroid(y=y, sr=sr),
-        librosa.feature.spectral_bandwidth(y=y, sr=sr),
-        librosa.feature.zero_crossing_rate(y),
-        librosa.feature.rms(y=y),
+        librosa.feature.spectral_centroid(y=audio, sr=sr),
+        librosa.feature.spectral_bandwidth(y=audio, sr=sr),
+        librosa.feature.zero_crossing_rate(audio),
+        librosa.feature.rms(y=audio),
     ]
 
     for feature in extra_features:
@@ -115,31 +103,27 @@ def extract_accent_features(
     return np.asarray(features, dtype=float).reshape(1, -1)
 
 
-def resolve_label(prediction, classes, labels):
-    """Support classifiers trained on either text labels or integer labels."""
-    if isinstance(prediction, (str, np.str_)):
-        return str(prediction)
-
-    index = int(prediction)
+def get_display_label(class_value, classes, labels):
+    """Convert the classifier's class value into a readable accent name."""
+    if isinstance(class_value, (str, np.str_)):
+        return str(class_value)
 
     if isinstance(labels, dict):
-        if index in labels:
-            return str(labels[index])
-        if str(index) in labels:
-            return str(labels[str(index)])
+        if class_value in labels:
+            return str(labels[class_value])
+        if str(class_value) in labels:
+            return str(labels[str(class_value)])
 
-    if labels is not None and 0 <= index < len(labels):
-        return str(labels[index])
+    if classes is not None and labels is not None:
+        for index, value in enumerate(classes):
+            if value == class_value and index < len(labels):
+                return str(labels[index])
 
-    # Fallback for classifiers whose class values are the actual labels.
-    if classes is not None and 0 <= index < len(classes):
-        return str(classes[index])
-
-    return str(prediction)
+    return str(class_value)
 
 
 def predict_accent(audio_path):
-    """Predict one of the accent classes supported by the trained model."""
+    """Predict an accent supported by the trained classifier."""
     bundle = get_accent_bundle()
     classifier = bundle["model"]
 
@@ -150,35 +134,32 @@ def predict_accent(audio_path):
     )
 
     expected_count = bundle.get("feature_count", 48)
-
     if features.shape[1] != expected_count:
         raise ValueError(
-            f"Feature mismatch: expected {expected_count}, "
-            f"got {features.shape[1]}."
+            f"Expected {expected_count} features, got {features.shape[1]}."
         )
 
-    prediction = classifier.predict(features)[0]
     classes = getattr(classifier, "classes_", None)
     labels = bundle.get("labels")
 
-    accent = resolve_label(prediction, classes, labels)
-
-    confidence = None
     if hasattr(classifier, "predict_proba"):
         probabilities = classifier.predict_proba(features)[0]
         best_index = int(np.argmax(probabilities))
-        confidence = round(float(probabilities[best_index]) * 100, 2)
 
-        # For classifiers trained directly on text labels, use the
-        # class associated with the highest probability.
         if classes is not None:
-            accent = str(classes[best_index])
-        elif labels is not None:
-            accent = resolve_label(best_index, None, labels)
+            class_value = classes[best_index]
+        else:
+            class_value = classifier.predict(features)[0]
 
-    result = {"accent": accent}
-    result["accent_confidence"] = confidence
-    return result
+        confidence = round(float(probabilities[best_index]) * 100, 2)
+    else:
+        class_value = classifier.predict(features)[0]
+        confidence = None
+
+    return {
+        "accent": get_display_label(class_value, classes, labels),
+        "accent_confidence": confidence,
+    }
 
 
 @app.post("/api/transcribe")
@@ -206,8 +187,8 @@ def transcribe_audio():
             temp_path = temp.name
             audio.save(temp_path)
 
-        # Transcribe the uploaded recording.
-        model = get_model()
+        # Speech transcription
+        model = get_whisper_model()
         segments, info = model.transcribe(temp_path)
 
         transcript = " ".join(
@@ -219,7 +200,7 @@ def transcribe_audio():
             "language": info.language,
         }
 
-        # Keep transcription available even if accent detection fails.
+        # Accent detection is independent of transcription.
         try:
             result.update(predict_accent(temp_path))
         except Exception:
@@ -247,8 +228,4 @@ def transcribe_audio():
 
 
 if __name__ == "__main__":
-    app.run(
-        debug=True,
-        host="127.0.0.1",
-        port=5000,
-    )
+    app.run(debug=True, host="127.0.0.1", port=5000)

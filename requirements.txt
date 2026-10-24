@@ -1,6 +1,12 @@
-numpy
-pandas
-librosa
-soundfile
 tqdm
+Flask
+faster-whisper
+librosa
+numpy
+joblib
+scikit-learn
+pandas
+matplotlib
+jiwer
+soundfile
 jupyter

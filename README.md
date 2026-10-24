@@ -1,111 +1,58 @@
-# Speech Noise Dataset Project
+# VoxLab: Speech Transcription with Different Accents and Background Noise
 
-This project creates a speech-in-noise dataset by combining speech recordings with background-noise recordings.
+## Overview
 
-The generated dataset can be used for experiments in speech processing, speech enhancement, noise robustness, and audio classification.
+VoxLab is a speech-processing project that transcribes English speech,
+predicts between two trained English accent categories, and evaluates
+how background noise affects transcription accuracy.
 
-## Project Overview
+The project uses Whisper for speech recognition and a machine-learning
+classifier for accent prediction.
 
-The project currently uses:
+## Features
 
-* **Speech dataset:** Southern American English speech recordings
-* **Noise dataset:** Background environmental noise recordings
-* **SNR levels:** 5 dB, 10 dB, and 20 dB
-* **Initial speech samples:** 20
-* **Generated noisy audio samples:** 60
+- Upload audio files through a Flask web interface.
+- Convert speech into text using Whisper Base.
+- Predict British English or Southern American English.
+- Display the classifier's estimated confidence score.
+- Evaluate transcription quality using Word Error Rate (WER).
+- Compare results at different signal-to-noise ratios (SNR).
+- Visualize noise experiment results through charts.
 
-Each noisy audio sample contains a clean speech recording mixed with a background-noise recording at a specified signal-to-noise ratio.
+## Technologies
+
+- Python
+- Flask
+- faster-whisper
+- librosa
+- NumPy
+- scikit-learn
+- joblib
+- HTML, CSS and JavaScript
+- Chart.js
 
 ## Project Structure
 
 ```text
 Speech-Noise-Project/
-│
-├── data/
-│   ├── raw/
-│   │   ├── speech/
-│   │   └── noise/
-│   │
-│   └── processed/
-│       └── noisy/
-│
-├── metadata/
-│   └── metadata.csv
-│
-├── data_preparation.ipynb
+├── app.py
 ├── requirements.txt
-├── .gitignore
-└── README.md
-```
-
-## Metadata
-
-The `metadata.csv` file records information about each generated sample, including:
-
-* Clean speech file path
-* Noisy speech file path
-* Noise file path
-* Signal-to-noise ratio
-* Accent group
-
-## How to Reproduce the Dataset
-
-1. Download the original speech dataset.
-
-2. Download the background-noise dataset.
-
-3. Place the speech files inside:
-
-   ```text
-   data/raw/speech/
-   ```
-
-4. Place the noise files inside:
-
-   ```text
-   data/raw/noise/
-   ```
-
-5. Open `data_preparation.ipynb` in Jupyter Notebook or VS Code.
-
-6. Run the notebook cells in order.
-
-7. The generated noisy audio files will be saved in:
-
-   ```text
-   data/processed/noisy/
-   ```
-
-8. The metadata will be saved in:
-
-   ```text
-   metadata/metadata.csv
-   ```
-
-## Important Note
-
-The original audio files are not included in this repository because of file size and dataset licensing restrictions.
-
-The notebook and metadata are included so that the dataset can be recreated using the original source datasets.
-
-Please follow the licenses and usage conditions of the original datasets.
-
-## Technologies Used
-
-* Python
-* Jupyter Notebook
-* NumPy
-* Pandas
-* SoundFile
-* Librosa
-* tqdm
-
-## Future Improvements
-
-* Add speech datasets from other accents.
-* Add more background-noise categories.
-* Include more SNR levels.
-* Increase the number of speech samples.
-* Add data validation and audio-quality checks.
-* Develop speech-enhancement and noise-classification models.
-
+├── README.md
+├── src/
+│   ├── train_accent_model.py
+│   ├── transcribe.py
+│   ├── dataset.py
+│   ├── evaluate_dataset.py
+│   ├── evaluate_clean.py
+│   └── visualize_results.py
+├── models/
+│   └── accent_classifier.joblib
+├── templates/
+│   └── index.html
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── script.js
+├── data/
+└── metadata/
