@@ -313,18 +313,31 @@ if (transcribeButton) {
         transcribeButton.disabled = true;
 
         try {
-            const response = await fetch("/api/transcribe", {
-                method: "POST",
-                body: formData
-            });
+            
+const response = await fetch("/api/transcribe", {
+    method: "POST",
+    body: formData
+});
 
-            const data = await response.json();
+const responseText = await response.text();
+let data = {};
 
-            if (!response.ok) {
-                throw new Error(
-                    data.error || "The transcription request failed."
-                );
-            }
+try {
+    data = responseText ? JSON.parse(responseText) : {};
+} catch {
+    throw new Error(
+        `Server returned an invalid response (HTTP ${response.status}). Check the Render logs.`
+    );
+}
+
+if (!response.ok) {
+    throw new Error(
+        data.error || `Request failed with status ${response.status}.`
+    );
+}
+
+// Continue with your existing success-handling code here.
+
 
             if (transcriptText) {
                 transcriptText.value = data.transcript || "";
