@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxLab | Speech Intelligence</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <a class="brand" href="#" data-page="dashboard">
+            <span class="brand-icon">V</span>
+            <span>Vox<span class="brand-light">Lab</span></span>
+        </a>
+
+        <p class="nav-label">WORKSPACE</p>
+        <button class="nav-link active" data-page="dashboard">
+            <span>▦</span> Overview
+        </button>
+        <button class="nav-link" data-page="transcribe">
+            <span>♫</span> Speech transcription
+        </button>
+        <button class="nav-link" data-page="analysis">
+            <span>⌁</span> Noise analysis
+        </button>
+
+        <div class="sidebar-bottom">
+            <div class="status-dot"></div>
+            <div>
+                <strong>Speech Recognition</strong>
+                <small>Research workspace</small>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div class="mobile-brand">VoxLab</div>
+            <div class="breadcrumb">Workspace <span>/</span> <strong id="page-breadcrumb">Overview</strong></div>
+            <div class="topbar-tag"><span class="live-dot"></span> MCA PROJECT</div>
+        </header>
+
+        <section class="page active-page" id="dashboard">
+            <div class="page-heading">
+                <div>
+                    <p class="eyebrow">SPEECH INTELLIGENCE PLATFORM</p>
+                    <h1>Speech, understood.</h1>
+                    <p class="subtitle">Explore how accents and background noise affect speech recognition.</p>
+                </div>
+                <button class="primary-btn" data-go="transcribe">＋ New transcription</button>
+            </div>
+
+            <div class="hero">
+                <div class="hero-copy">
+                    <span class="hero-badge">● RESEARCH PROJECT</span>
+                    <h2>Understanding speech<br>in a noisy world.</h2>
+                    <p>Analyze speech recordings, generate transcripts, and study recognition errors under different acoustic conditions.</p>
+                    <button class="hero-btn" data-go="transcribe">Start analyzing <span>→</span></button>
+                </div>
+                <div class="sound-visual" aria-label="Decorative audio waveform">
+                    <div class="wave">
+                        <i style="--h:22%"></i><i style="--h:38%"></i>
+                        <i style="--h:58%"></i><i style="--h:32%"></i>
+                        <i style="--h:75%"></i><i style="--h:48%"></i>
+                        <i style="--h:92%"></i><i style="--h:62%"></i>
+                        <i style="--h:35%"></i><i style="--h:82%"></i>
+                        <i style="--h:50%"></i><i style="--h:100%"></i>
+                        <i style="--h:67%"></i><i style="--h:40%"></i>
+                        <i style="--h:72%"></i><i style="--h:28%"></i>
+                        <i style="--h:55%"></i><i style="--h:85%"></i>
+                        <i style="--h:45%"></i><i style="--h:24%"></i>
+                        <i style="--h:61%"></i><i style="--h:37%"></i>
+                        <i style="--h:78%"></i><i style="--h:32%"></i>
+                        <i style="--h:52%"></i><i style="--h:20%"></i>
+                    </div>
+                    <div class="wave-caption"><span>VOICE SIGNAL</span><span>ACOUSTIC ANALYSIS</span></div>
+                </div>
+            </div>
+
+            <div class="section-heading">
+                <div><h2>Project overview</h2><p>Your current experiment workspace</p></div>
+                <span class="muted-chip">Existing results</span>
+            </div>
+
+            <div class="stats-grid">
+                <article class="stat-card">
+                    <div class="stat-top"><span>Evaluated recordings</span><span class="stat-icon">♫</span></div>
+                    <div class="stat-value">60</div>
+                    <p class="stat-note">Current noisy-speech experiment</p>
+                </article>
+                <article class="stat-card">
+                    <div class="stat-top"><span>Noise levels</span><span class="stat-icon">⌁</span></div>
+                    <div class="stat-value">3</div>
+                    <p class="stat-note">5, 10 and 20 dB SNR</p>
+                </article>
+                <article class="stat-card">
+                    <div class="stat-top"><span>Average WER at 20 dB</span><span class="stat-icon">↘</span></div>
+                    <div class="stat-value">36.14<span class="unit">%</span></div>
+                    <p class="stat-note">Lower WER means fewer word errors</p>
+                </article>
+                <article class="stat-card">
+                    <div class="stat-top"><span>Accents evaluated</span><span class="stat-icon">◎</span></div>
+                    <div class="stat-value">1</div>
+                    <p class="stat-note">Southern American English</p>
+                </article>
+            </div>
+
+            <div class="content-grid">
+                <article class="panel chart-panel">
+                    <div class="panel-heading">
+                        <div><h3>Noise vs. transcription errors</h3><p>Existing Southern American English results</p></div>
+                        <span class="chart-legend"><i></i> Average WER</span>
+                    </div>
+                    <div class="chart-wrap"><canvas id="overviewChart"></canvas></div>
+                    <p class="chart-footnote">WER = Word Error Rate · SNR = Signal-to-Noise Ratio</p>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-heading"><div><h3>Experiment details</h3><p>Current evaluation</p></div></div>
+                    <div class="detail-row"><span>Speech dataset</span><strong>Common Voice</strong></div>
+                    <div class="detail-row"><span>Recognition model</span><strong>Whisper Base</strong></div>
+                    <div class="detail-row"><span>Processing device</span><strong>CPU · int8</strong></div>
+                    <div class="detail-row"><span>Evaluation metric</span><strong>WER</strong></div>
+                    <div class="detail-row"><span>Next milestone</span><strong class="accent-text">Accent comparison</strong></div>
+                    <button class="text-btn" data-go="analysis">View analysis →</button>
+                </article>
+            </div>
+            <p class="disclaimer">Dashboard statistics reflect the existing experiment, not a completed multi-accent comparison.</p>
+        </section>
+
+        <section class="page" id="transcribe">
+            <div class="page-heading">
+                <div>
+                    <p class="eyebrow">AUDIO WORKSPACE</p>
+                    <h1>Speech transcription</h1>
+                    <p class="subtitle">Upload a recording and generate a transcript using your speech recognition model.</p>
+                </div>
+            </div>
+
+            <div class="transcribe-layout">
+                <article class="panel upload-panel">
+                    <h3>Upload audio</h3>
+                    <p class="panel-description">Choose a speech recording from your device.</p>
+                    <label class="upload-zone" id="upload-zone" for="audio-file">
+                        <span class="upload-symbol">↑</span>
+                        <strong>Drop your audio here</strong>
+                        <span>or <u>browse files</u></span>
+                        <small>WAV, MP3, M4A, FLAC, OGG · Max 20 MB</small>
+                        <input type="file" id="audio-file" accept=".wav,.mp3,.m4a,.flac,.ogg,audio/*" hidden>
+                    </label>
+                    <div class="file-preview" id="file-preview" hidden>
+                        <div class="file-icon">♫</div>
+                        <div class="file-info"><strong id="file-name"></strong><small id="file-size"></small></div>
+                        <button class="remove-file" id="remove-file" aria-label="Remove file">×</button>
+                    </div>
+                    <audio id="audio-preview" controls hidden></audio>
+                    <button class="primary-btn full-btn" id="transcribe-btn" disabled>Generate transcription →</button>
+                    <p class="helper-text">Transcription runs on the Python backend when it is connected.</p>
+                </article>
+
+                <article class="panel output-panel">
+                    <div class="panel-heading"><div><h3>Transcript output</h3><p>Recognized speech will appear here</p></div><span class="output-status" id="output-status">Waiting for audio</span></div>
+                    <div class="empty-output" id="empty-output">
+                        <div class="empty-icon">Aa</div>
+                        <strong>Your transcript will appear here</strong>
+                        <p>Upload a recording and start transcription to see the recognized words.</p>
+                    </div>
+                    <div id="transcript-result" hidden>
+                        <label for="transcript-text">Recognized text</label>
+                        <textarea id="transcript-text" rows="9" readonly></textarea>
+                        <div class="result-actions"><button class="secondary-btn" id="copy-btn">Copy text</button><button class="secondary-btn" id="download-btn">Download .txt</button></div>
+                        <div class="wer-box" id="wer-box" hidden><span>Word Error Rate</span><strong id="wer-value">—</strong></div>
+                    </div>
+                    <div class="progress-area" id="progress-area" hidden><div class="spinner"></div><span>Transcribing audio. This may take a moment...</span></div>
+                    <div class="error-message" id="error-message" hidden></div>
+                </article>
+            </div>
+        </section>
+
+        <section class="page" id="analysis">
+            <div class="page-heading">
+                <div>
+                    <p class="eyebrow">EXPERIMENT RESULTS</p>
+                    <h1>Noise analysis</h1>
+                    <p class="subtitle">Explore how signal-to-noise ratio affects speech recognition accuracy.</p>
+                </div>
+            </div>
+            <div class="stats-grid compact-stats">
+                <article class="stat-card"><div class="stat-top"><span>5 dB · Average WER</span><span class="stat-icon">!</span></div><div class="stat-value">49.40%</div><p class="stat-note">Highest error rate of these three conditions</p></article>
+                <article class="stat-card"><div class="stat-top"><span>10 dB · Average WER</span><span class="stat-icon">⌁</span></div><div class="stat-value">41.43%</div><p class="stat-note">Intermediate noise condition</p></article>
+                <article class="stat-card"><div class="stat-top"><span>20 dB · Average WER</span><span class="stat-icon">↘</span></div><div class="stat-value">36.14%</div><p class="stat-note">Lowest average WER among tested levels</p></article>
+            </div>
+            <article class="panel large-chart">
+                <div class="panel-heading"><div><h3>Word Error Rate by SNR</h3><p>Existing noisy-speech evaluation · 20 recordings per level</p></div><span class="muted-chip">Lower is better</span></div>
+                <div class="chart-wrap"><canvas id="analysisChart"></canvas></div>
+                <div class="insight"><span class="insight-icon">↗</span><p><strong>Observed trend</strong><br>Average WER decreased as SNR increased in this experiment. This describes the current dataset; it does not establish results for British English.</p></div>
+            </article>
+        </section>
+
+        <footer class="footer">VoxLab <span>·</span> MCA Speech Recognition Project <span>·</span> Built with Python</footer>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

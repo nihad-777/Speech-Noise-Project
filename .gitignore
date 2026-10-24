@@ -2,10 +2,16 @@
 __pycache__/
 
 data/raw/
-data/processed/
+data/processed/noisy
 
 *.wav
 *.mp3
 *.flac
 *.ogg
 *.zip
+
+
+*.py[cod]
+
+# Temporary files
+*.tmp
