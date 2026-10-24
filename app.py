@@ -40,10 +40,12 @@ def get_whisper_model():
 
     if _whisper_model is None:
         _whisper_model = WhisperModel(
-            "base",
-            device="cpu",
-            compute_type="int8",
-        )
+    "tiny",
+    device="cpu",
+    compute_type="int8",
+    cpu_threads=1,
+    num_workers=1,
+)
 
     return _whisper_model
 
@@ -229,3 +231,10 @@ def transcribe_audio():
 
 if __name__ == "__main__":
     app.run(debug=True, host="127.0.0.1", port=5000)
+
+if __name__ == "__main__":
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 10000)),
+        debug=False,
+    )
